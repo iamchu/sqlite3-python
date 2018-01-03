@@ -13,41 +13,17 @@ import os
 import requests
 import bs4
 
-def main():
-	grabCompanyCodes()
 
-# grab BOVESPA company codes
-def grabCompanyCodes():
-	url = 'https://cotacoes.economia.uol.com.br/acoes-bovespa.html?exchangeCode=.BVSP&page=1&size=3000'
+def tableConstructor(table_name):
+	con = lite.connect('test.db')
 
-	page = requests.get(url)
-	page.raise_for_status()
-	cotacoes_soup = bs4.BeautifulSoup(page.text, "lxml")
+	with con:
+	    
+	    cur = con.cursor()    
+	    command_string_create = "CREATE TABLE "+ table_name +"(data TEXT, cotacao REAL, minima REAL, maxima REAL, variacao REAL, variacao_porcentagem REAL, volume INT)" 
+	    command_string_insert = "INSERT INTO " + table_name + " VALUES('21/12/2017', 1231.12, 1000.12, 1300.14, 100.12, 10, 999111222)"
+	    cur.execute(command_string_create)
+	    cur.execute(command_string_insert)
 
-	company_codes = cotacoes_soup.find_all(class_ = "clear-box")
+tableConstructor("ITUB4_SA")
 
-	for code in company_codes:
-		print code
-
-
-con = None
-
-try:
-    con = lite.connect('test.db')
-    
-    cur = con.cursor()    
-    cur.execute('SELECT SQLITE_VERSION()')
-    
-    data = cur.fetchone()
-    
-    print "SQLite version: %s" % data                
-    
-except lite.Error, e:
-    
-    print "Error %s:" % e.args[0]
-    sys.exit(1)
-    
-finally:
-    
-    if con:
-        con.close()
