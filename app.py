@@ -14,16 +14,24 @@ import requests
 import bs4
 
 
+
 def tableConstructor(table_name):
 	con = lite.connect('test.db')
 
+	# pessoas = (("joao",10, ""), 
+	# 	("Maria", 20, "01/11/1990"),
+	# 	("Alex", 30, "9/09/1980"))
+
+	pessoas = []
+
+	for i in range(2000):
+		pessoas.append(["2 - 4" + str(i/20), i, str(i*10) ])	
+
 	with con:
-	    
 	    cur = con.cursor()    
-	    command_string_create = "CREATE TABLE "+ table_name +"(data TEXT, cotacao REAL, minima REAL, maxima REAL, variacao REAL, variacao_porcentagem REAL, volume INT)" 
-	    command_string_insert = "INSERT INTO " + table_name + " VALUES('21/12/2017', 1231.12, 1000.12, 1300.14, 100.12, 10, 999111222)"
-	    cur.execute(command_string_create)
-	    cur.execute(command_string_insert)
+	    cur.execute("DROP TABLE IF EXISTS people")
+	    cur.execute("CREATE TABLE people(nome TEXT, idade REAL, aniversario TEXT)")
+	    cur.executemany("INSERT INTO people VALUES(?,?,?)", pessoas)
 
 tableConstructor("ITUB4_SA")
 
